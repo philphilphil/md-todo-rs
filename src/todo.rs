@@ -1,7 +1,7 @@
 use std::fmt::{Display, Formatter, Result};
 use std::path::PathBuf;
 
-#[derive(Default, Clone)]
+#[derive(Default, Debug)]
 /// test
 ///
 pub struct Todo {
@@ -42,7 +42,8 @@ impl Todo {
     /// # Examples
     ///
     /// ```
-    ///todo.toggle();
+    /// //let todo = Todo::Default();
+    /// //todo.toggle();
     /// ```
     pub fn toggle(&mut self) {
         // md_writer::toggle_todo(self).unwrap();
