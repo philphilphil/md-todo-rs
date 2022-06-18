@@ -1,6 +1,8 @@
 use std::fmt::{Display, Formatter, Result};
 use std::path::PathBuf;
 
+use crate::md_writer;
+
 #[derive(Default, Debug)]
 /// A todo line in the markdown file
 pub struct Todo {
@@ -51,7 +53,7 @@ impl Todo {
     /// //todo.toggle();
     /// ```
     pub fn toggle(&mut self) {
-        // md_writer::toggle_todo(self).unwrap();
+        md_writer::toggle_todo(self).unwrap();
     }
 }
 
