@@ -53,9 +53,8 @@ fn read_file(file: &DirEntry, todos: &mut Vec<Todo>) -> Result<()> {
 
 // Not sure if this method should be here or in Todo.rs...
 fn build_todo(file: &DirEntry, file_content: &str, line: &str, line_no: usize) -> Result<Todo> {
-    let done = line.starts_with("- [x]");
-
     let name = line[6..line.len()].to_string();
+    let done = line.starts_with("- [x]");
     let filename = file.file_name().to_str().unwrap().to_lowercase();
     let filepath = file.path();
     let headings = get_headings(file_content, (line_no + 1) as u32)?;

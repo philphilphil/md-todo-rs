@@ -21,7 +21,7 @@ pub struct Todo {
 }
 
 impl Todo {
-    /// Creates a new todo
+    /// Creates a new todo with all its metadata
     pub fn new(
         name: &str,
         filename: &str,
@@ -62,5 +62,44 @@ impl Display for Todo {
             todo_state = "[x]"
         }
         write!(f, "{} {}", todo_state, self.name)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+
+    fn get_simple_todo() -> Todo {
+        Todo::new(
+            "A todo",
+            "SomeFile.md",
+            33,
+            false,
+            PathBuf::default(),
+            vec!["# One".to_string(), "# Two".to_string()],
+            "123ABC".to_string(),
+        )
+    }
+
+    #[test]
+    fn test_creation_with_new() {
+        let todo = get_simple_todo();
+
+        assert_eq!(todo.name, "A todo");
+        assert_eq!(todo.filename, "SomeFile.md");
+        assert_eq!(todo.line_no, 33);
+        assert!(!todo.done);
+        assert_eq!(todo.filepath, PathBuf::default());
+        assert_eq!(todo.headings[1], "# Two");
+        assert_eq!(todo.file_md5, "123ABC");
+    }
+
+    #[test]
+    fn test_display() {
+        let mut todo = get_simple_todo();
+        assert_eq!(format!("{}", todo), "[ ] A todo");
+        todo.done = true;
+        assert_eq!(format!("{}", todo), "[x] A todo");
     }
 }
