@@ -1,17 +1,18 @@
-use crate::error::MDTodoError;
 use crate::todo::Todo;
 use anyhow::Result;
 use std::fs;
 use std::fs::DirEntry;
 use std::path::Path;
 
-/// Recrusivly walks all directories and parses the todos out of the files.
+/// Gets a Vector of all todos that can be found in markdown-files in directorys
+/// beneath the given Path.
 pub fn load_todos_from_dir(dir: &Path) -> Result<Vec<Todo>> {
     let mut todos: Vec<Todo> = vec![];
     walk_folder_tree(dir, &mut todos)?;
     Ok(todos)
 }
 
+/// Recrusivly walk the directory tree and read all markdown files
 fn walk_folder_tree(dir: &Path, todos: &mut Vec<Todo>) -> Result<()> {
     if dir.is_dir() {
         for entry in fs::read_dir(dir)? {
@@ -34,6 +35,7 @@ fn walk_folder_tree(dir: &Path, todos: &mut Vec<Todo>) -> Result<()> {
     Ok(())
 }
 
+/// Parses a file and builds Todo objects for each todo found
 fn read_file(file: &DirEntry, todos: &mut Vec<Todo>) -> Result<()> {
     let file_content = fs::read_to_string(file.path())?;
 
@@ -51,13 +53,13 @@ fn read_file(file: &DirEntry, todos: &mut Vec<Todo>) -> Result<()> {
     Ok(())
 }
 
-// Not sure if this method should be here or in Todo.rs...
-fn build_todo(file: &DirEntry, file_content: &str, line: &str, line_no: usize) -> Result<Todo> {
+/// Builds a todo out of the metadata of the file
+fn build_todo(file: &DirEntry, file_text: &str, line: &str, line_no: usize) -> Result<Todo> {
     let name = line[6..line.len()].to_string();
     let done = line.starts_with("- [x]");
     let filename = file.file_name().to_str().unwrap().to_lowercase();
     let filepath = file.path();
-    let headings = get_headings(file_content, (line_no + 1) as u32)?;
+    let headings = get_headings(file_text, (line_no + 1) as u32)?;
     let file_md5 = "ddd".to_string();
 
     let todo = Todo::new(
@@ -73,23 +75,25 @@ fn build_todo(file: &DirEntry, file_content: &str, line: &str, line_no: usize) -
     Ok(todo)
 }
 
-fn get_headings(data: &str, todo_line_no: u32) -> Result<Vec<String>> {
+/// Gets all headings above the todo in reverse order.
+/// First heading above the todo = first entry in vec.
+fn get_headings(file_text_content: &str, todo_line_no: u32) -> Result<Vec<String>> {
     let mut headings = vec![];
 
-    // TODO: Search in other direction
-    // let mut line_no = 1;
-    // let mut heading = String::from("");
-    // for line in data.lines() {
-    //     if line_no == todo_line_no {
-    //         break;
-    //     }
+    let mut line_no = 1;
+    for line in file_text_content.lines() {
+        if line_no == todo_line_no {
+            break;
+        }
 
-    //     if line.trim_start().starts_with('#') {
-    //         heading = line.trim_start().to_string();
-    //     }
+        let line = line.trim_start();
 
-    //     line_no += 1;
-    // }
+        if line.starts_with('#') {
+            headings.push(line.to_string());
+        }
 
+        line_no += 1;
+    }
+    headings.reverse();
     Ok(headings)
 }
