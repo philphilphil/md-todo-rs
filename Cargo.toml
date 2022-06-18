@@ -10,5 +10,6 @@ documentation = "https://docs.rs/crate/md-todo"
 
 [dependencies]
 anyhow = "1"
+md-5 = "0.10.0"
 tempfile = "3.3.0"
 thiserror = "1"

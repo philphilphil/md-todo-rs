@@ -17,7 +17,7 @@ pub struct Todo {
     /// Full path to the file containing the todo
     pub filepath: PathBuf,
     /// MD5 hash of the file containing the todo
-    pub file_md5: String,
+    pub file_md5: Vec<u8>,
     /// All headings above the todo in reverse order
     pub headings: Vec<String>,
 }
@@ -31,7 +31,7 @@ impl Todo {
         done: bool,
         filepath: PathBuf,
         headings: Vec<String>,
-        file_md5: String,
+        file_md5: Vec<u8>,
     ) -> Todo {
         Todo {
             name: name.to_string(),
@@ -73,7 +73,7 @@ mod tests {
             false,
             PathBuf::default(),
             vec!["# One".to_string(), "# Two".to_string()],
-            "123ABC".to_string(),
+            vec![1, 2, 3],
         )
     }
 
@@ -87,7 +87,7 @@ mod tests {
         assert!(!todo.done);
         assert_eq!(todo.filepath, PathBuf::default());
         assert_eq!(todo.headings[1], "# Two");
-        assert_eq!(todo.file_md5, "123ABC");
+        assert_eq!(todo.file_md5[2], 3);
     }
 
     #[test]

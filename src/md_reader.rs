@@ -1,5 +1,6 @@
 use crate::todo::Todo;
 use anyhow::Result;
+use md5::{Digest, Md5};
 use std::fs;
 use std::fs::DirEntry;
 use std::path::Path;
@@ -60,7 +61,10 @@ fn build_todo(file: &DirEntry, file_text: &str, line: &str, line_no: usize) -> R
     let filename = file.file_name().to_str().unwrap().to_lowercase();
     let filepath = file.path();
     let headings = get_headings(file_text, (line_no + 1) as u32)?;
-    let file_md5 = "ddd".to_string();
+
+    let mut hasher = Md5::new();
+    hasher.update(file_text);
+    let file_md5 = hasher.finalize();
 
     let todo = Todo::new(
         &name,
@@ -69,7 +73,7 @@ fn build_todo(file: &DirEntry, file_text: &str, line: &str, line_no: usize) -> R
         done,
         filepath,
         headings,
-        file_md5,
+        file_md5.to_vec(),
     );
 
     Ok(todo)
