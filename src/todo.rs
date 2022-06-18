@@ -3,7 +3,7 @@ use std::path::PathBuf;
 
 use crate::md_writer;
 
-#[derive(Default, Debug)]
+#[derive(Debug, Default)]
 /// A todo line in the markdown file
 pub struct Todo {
     /// The text of the todo
@@ -45,13 +45,6 @@ impl Todo {
     }
 
     /// Toggles the state of the todo to open or done.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// //let todo = Todo::Default();
-    /// //todo.toggle();
-    /// ```
     pub fn toggle(&mut self) {
         md_writer::toggle_todo(self).unwrap();
     }
