@@ -1,72 +1,96 @@
+use crate::error::MDTodoError;
 use crate::todo::Todo;
+use anyhow::Result;
 use std::fs;
 use std::fs::DirEntry;
-use std::io;
 use std::path::Path;
 
-// Itterate all directorys and get md files
-pub fn load_todos_from_dir(dir: &Path) -> io::Result<Vec<Todo>> {
+/// Recrusivly walks all directories and parses the todos out of the files.
+pub fn load_todos_from_dir(dir: &Path) -> Result<Vec<Todo>> {
     let mut todos: Vec<Todo> = vec![];
+    walk_folder_tree(dir, &mut todos)?;
+    Ok(todos)
+}
 
+fn walk_folder_tree(dir: &Path, todos: &mut Vec<Todo>) -> Result<()> {
     if dir.is_dir() {
         for entry in fs::read_dir(dir)? {
             let entry = entry?;
-            let path = entry.path();
-            if path.is_dir() {
-                todos.append(&mut load_todos_from_dir(&path)?);
-            } else if entry.file_name().to_str().unwrap().ends_with("md") {
-                todos.append(&mut load_todos_from_mdfile(&entry)?);
+            let entry_path = entry.path();
+            if entry_path.is_dir() {
+                walk_folder_tree(&entry_path, todos)?;
+            } else {
+                match entry.file_name().to_str() {
+                    Some(file_name) => {
+                        if file_name.ends_with("md") {
+                            read_file(&entry, todos)?;
+                        }
+                    }
+                    None => panic!("Cant get filename of path {}", entry_path.to_str().unwrap()),
+                }
             }
         }
     }
-    Ok(todos)
+    Ok(())
 }
 
-fn load_todos_from_mdfile(file: &DirEntry) -> io::Result<Vec<Todo>> {
-    let data = fs::read_to_string(file.path())?;
-    let mut todos: Vec<Todo> = vec![];
+fn read_file(file: &DirEntry, todos: &mut Vec<Todo>) -> Result<()> {
+    let file_content = fs::read_to_string(file.path())?;
 
-    for (line_no, line) in data.lines().enumerate() {
-        let line_trimed = line.trim_start();
+    for (line_no, line) in file_content.lines().enumerate() {
+        let line = line.trim_start();
 
-        if !line_trimed.starts_with("- [x]") && !line_trimed.starts_with("- [ ]") {
+        if !line.starts_with("- [x]") && !line.starts_with("- [ ]") {
             continue;
         }
 
-        let done = line_trimed.starts_with("- [x]");
-
-        let first_heading = get_first_heading(&data, (line_no + 1) as u32);
-        let todo = Todo::new(
-            &line_trimed[6..line_trimed.len()],
-            &file.file_name().to_str().unwrap().to_lowercase(),
-            (line_no + 1) as u32,
-            done,
-            file.path().to_path_buf(),
-            vec![],
-            "dd".to_string(),
-        );
-
+        let todo = build_todo(file, &file_content, line, line_no)?;
         todos.push(todo);
     }
 
-    Ok(todos)
+    Ok(())
 }
 
-fn get_first_heading(data: &str, todo_line_no: u32) -> String {
+// Not sure if this method should be here or in Todo.rs...
+fn build_todo(file: &DirEntry, file_content: &str, line: &str, line_no: usize) -> Result<Todo> {
+    let done = line.starts_with("- [x]");
+
+    let name = line[6..line.len()].to_string();
+    let filename = file.file_name().to_str().unwrap().to_lowercase();
+    let filepath = file.path();
+    let headings = get_headings(file_content, (line_no + 1) as u32)?;
+    let file_md5 = "ddd".to_string();
+
+    let todo = Todo::new(
+        &name,
+        &filename,
+        line_no + 1,
+        done,
+        filepath,
+        headings,
+        file_md5,
+    );
+
+    Ok(todo)
+}
+
+fn get_headings(data: &str, todo_line_no: u32) -> Result<Vec<String>> {
+    let mut headings = vec![];
+
     // TODO: Search in other direction
-    let mut line_no = 1;
-    let mut heading = String::from("");
-    for line in data.lines() {
-        if line_no == todo_line_no {
-            break;
-        }
+    // let mut line_no = 1;
+    // let mut heading = String::from("");
+    // for line in data.lines() {
+    //     if line_no == todo_line_no {
+    //         break;
+    //     }
 
-        if line.trim_start().starts_with('#') {
-            heading = line.trim_start().to_string();
-        }
+    //     if line.trim_start().starts_with('#') {
+    //         heading = line.trim_start().to_string();
+    //     }
 
-        line_no += 1;
-    }
+    //     line_no += 1;
+    // }
 
-    heading
+    Ok(headings)
 }

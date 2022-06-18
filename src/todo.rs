@@ -2,23 +2,30 @@ use std::fmt::{Display, Formatter, Result};
 use std::path::PathBuf;
 
 #[derive(Default, Debug)]
-/// test
-///
+/// A todo line in the markdown file
 pub struct Todo {
+    /// The text of the todo
     pub name: String,
+    /// Filename of the file containing the todo
     pub filename: String,
-    pub line_no: u32,
+    /// Line number where the todo is
+    pub line_no: usize,
+    /// Is the todo marked as done or not
     pub done: bool,
+    /// Full path to the file containing the todo
     pub filepath: PathBuf,
-    file_md5: String,
+    /// MD5 hash of the file containing the todo
+    pub file_md5: String,
+    /// All headings above the todo in reverse order
     pub headings: Vec<String>,
 }
 
 impl Todo {
+    /// Creates a new todo
     pub fn new(
         name: &str,
         filename: &str,
-        line_no: u32,
+        line_no: usize,
         done: bool,
         filepath: PathBuf,
         headings: Vec<String>,
@@ -34,9 +41,7 @@ impl Todo {
             file_md5,
         }
     }
-}
 
-impl Todo {
     /// Toggles the state of the todo to open or done.
     ///
     /// # Examples
