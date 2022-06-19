@@ -5,12 +5,6 @@ use anyhow::Result;
 use std::fs;
 use std::path::Path;
 
-/// Toggles the done state of the todo in the physical file.
-/// This is done via finding the line of the todo and replacing `[ ]` with `[x]` or the other way.
-/// There is no other change, just a replace.
-///
-/// Before the change is done, its checked if the file changed since the last load of todos.
-/// If yes an error is returned.
 pub fn toggle_todo(todo: &mut Todo) -> Result<()> {
     if did_file_change_since_read(todo)? {
         return Err(anyhow::Error::new(MDTodoError::FileChanged));

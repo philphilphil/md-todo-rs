@@ -5,9 +5,7 @@ use std::fs;
 use std::fs::DirEntry;
 use std::path::Path;
 
-/// Gets a Vector of all todos that can be found in markdown-files in directorys
-/// beneath the given Path.
-pub fn load_todos_from_dir(dir: &Path) -> Result<Vec<Todo>> {
+pub fn get_todos_from_dir(dir: &Path) -> Result<Vec<Todo>> {
     let mut todos: Vec<Todo> = vec![];
     walk_folder_tree(dir, &mut todos)?;
     Ok(todos)
