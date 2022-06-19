@@ -4,6 +4,7 @@ use crate::todo::Todo;
 use anyhow::Result;
 use std::fs;
 use std::path::Path;
+
 /// Toggles the done state of the todo in the physical file.
 /// This is done via finding the line of the todo and replacing `[ ]` with `[x]` or the other way.
 /// There is no other change, just a replace.

@@ -1,6 +1,5 @@
 mod common;
 use common::md_test_file_creator;
-use md_todo::md_reader;
 use tempfile::TempDir;
 
 #[test]
@@ -8,7 +7,7 @@ fn test_parse_single_file() {
     let dir = TempDir::new().unwrap();
     md_test_file_creator::simple_1_open_todo(&dir, "file0.md").unwrap();
 
-    let todos = md_reader::load_todos_from_dir(dir.path()).unwrap();
+    let todos = md_todo::get_todos_from_path(dir.path()).unwrap();
     assert_eq!(todos.len(), 1);
     assert_eq!(todos[0].name, "A single open todo!");
     assert!(!todos[0].done);
@@ -22,7 +21,7 @@ fn test_parse_single_complex_file() {
     let dir = TempDir::new().unwrap();
     md_test_file_creator::complex_23_todos_15_open(&dir, "file0.md").unwrap();
 
-    let todos = md_reader::load_todos_from_dir(dir.path()).unwrap();
+    let todos = md_todo::get_todos_from_path(dir.path()).unwrap();
     assert_eq!(todos.len(), 23);
 
     dir.close().unwrap();
@@ -35,7 +34,7 @@ fn test_parse_three_files() {
     md_test_file_creator::simple_1_open_todo(&dir, "file1.md").unwrap();
     md_test_file_creator::simple_1_open_todo(&dir, "file2.md").unwrap();
 
-    let todos = md_reader::load_todos_from_dir(dir.path()).unwrap();
+    let todos = md_todo::get_todos_from_path(dir.path()).unwrap();
     assert_eq!(todos.len(), 3);
     let open_todos_count = todos.iter().filter(|t| !t.done).count();
     assert_eq!(open_todos_count, 3);
@@ -53,7 +52,7 @@ fn test_parse_multiple_file_types() {
     md_test_file_creator::simple_1_open_todo(&dir, "file2.mad").unwrap();
     md_test_file_creator::simple_1_open_todo(&dir, "file3.md").unwrap();
 
-    let todos = md_reader::load_todos_from_dir(dir.path()).unwrap();
+    let todos = md_todo::get_todos_from_path(dir.path()).unwrap();
     let closed_todos_count = todos.iter().filter(|t| t.done).count();
     assert_eq!(closed_todos_count, 0);
     assert_eq!(todos.len(), 2); // only md files are read
@@ -66,7 +65,7 @@ fn test_parse_single_files_multiple_todos() {
     let dir = TempDir::new().unwrap();
     md_test_file_creator::simple_5_todos_4_open(&dir, "file_123_323.md").unwrap();
 
-    let todos = md_reader::load_todos_from_dir(dir.path()).unwrap();
+    let todos = md_todo::get_todos_from_path(dir.path()).unwrap();
     assert_eq!(todos.len(), 5);
     assert_eq!(todos[0].name, "A open todo!");
     assert!(!todos[1].done);
@@ -80,7 +79,7 @@ fn test_parse_single_file_with_headers() {
     let dir = TempDir::new().unwrap();
     md_test_file_creator::simple_5_todos_3_open_with_headings(&dir, "file1.md").unwrap();
 
-    let todos = md_reader::load_todos_from_dir(dir.path()).unwrap();
+    let todos = md_todo::get_todos_from_path(dir.path()).unwrap();
     assert_eq!(todos.len(), 5);
     assert_eq!(todos[0].headings[0], "# Heading2");
     assert!(!todos[0].done);
@@ -124,7 +123,7 @@ fn test_parse_multiple_files_and_folders_multiple_todos() {
     md_test_file_creator::simple_5_todos_4_open(&_dir_depth2, "file1.md").unwrap();
     md_test_file_creator::simple_5_todos_4_open(&_dir_depth2, "file2.md").unwrap();
 
-    let todos = md_reader::load_todos_from_dir(dir.path()).unwrap();
+    let todos = md_todo::get_todos_from_path(dir.path()).unwrap();
     assert_eq!(todos.len(), 40);
     let open_todos_count = todos.iter().filter(|t| !t.done).count();
     assert_eq!(open_todos_count, 32);
@@ -154,7 +153,7 @@ fn test_parse_multiple_complex_files_and_folders_multiple_todos() {
     md_test_file_creator::complex_23_todos_15_open(&_dir_depth7, "file1.md").unwrap();
     md_test_file_creator::complex_23_todos_15_open(&_dir_depth7, "file2.md").unwrap();
 
-    let todos = md_reader::load_todos_from_dir(dir.path()).unwrap();
+    let todos = md_todo::get_todos_from_path(dir.path()).unwrap();
     assert_eq!(todos.len(), 122);
     let open_todos_count = todos.iter().filter(|t| !t.done).count();
     let closed_todos_count = todos.iter().filter(|t| t.done).count();
