@@ -4,12 +4,16 @@ use thiserror::Error;
 #[derive(Error, Debug)]
 pub enum MDTodoError {
     /// Issue while parsing the todo.
-    #[error("Issue parsing a todo.")]
+    #[error("Issue parsing a todo")]
     TodoParseError,
 
     /// Represents a failure to read from input.
     #[error("Read error")]
     FileReadError { source: std::io::Error },
+
+    /// The file changed since it was last read
+    #[error("File changed error")]
+    FileChanged,
 
     /// Represents all other cases of `std::io::Error`.
     #[error(transparent)]

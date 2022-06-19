@@ -61,10 +61,7 @@ fn build_todo(file: &DirEntry, file_text: &str, line: &str, line_no: usize) -> R
     let filename = file.file_name().to_str().unwrap().to_lowercase();
     let filepath = file.path();
     let headings = get_headings(file_text, (line_no + 1) as u32)?;
-
-    let mut hasher = Md5::new();
-    hasher.update(file_text);
-    let file_md5 = hasher.finalize();
+    let file_md5 = get_file_content_md5(file_text);
 
     let todo = Todo::new(
         &name,
@@ -73,7 +70,7 @@ fn build_todo(file: &DirEntry, file_text: &str, line: &str, line_no: usize) -> R
         done,
         filepath,
         headings,
-        file_md5.to_vec(),
+        file_md5,
     );
 
     Ok(todo)
@@ -100,4 +97,11 @@ fn get_headings(file_text_content: &str, todo_line_no: u32) -> Result<Vec<String
     }
     headings.reverse();
     Ok(headings)
+}
+
+pub fn get_file_content_md5(file_text: &str) -> Vec<u8> {
+    let mut hasher = Md5::new();
+    hasher.update(file_text);
+    let file_md5 = hasher.finalize();
+    file_md5.to_vec()
 }
