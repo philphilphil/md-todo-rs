@@ -1,7 +1,7 @@
 use crate::error::MDTodoError;
 use crate::md_reader;
 use crate::todo::Todo;
-use anyhow::{bail, Result};
+use anyhow::Result;
 use std::fs;
 use std::path::Path;
 /// Toggles the done state of the todo in the physical file.
