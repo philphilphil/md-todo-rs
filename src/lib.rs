@@ -26,3 +26,15 @@ pub fn get_todos_from_path(dir: &dyn AsRef<Path>) -> Result<Vec<Todo>> {
 pub fn toggle_todo(todo: &mut Todo) -> Result<()> {
     md_writer::toggle_todo(todo)
 }
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+
+    #[test]
+    #[should_panic]
+    fn test_invalid_path() {
+        get_todos_from_path(&"thisPath/ShouldNotExist32/2/013".to_string()).unwrap();
+    }
+}
