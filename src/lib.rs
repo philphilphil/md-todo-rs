@@ -10,12 +10,12 @@ pub mod todo;
 
 /// Gets a Vector of all todos that can be found in markdown-files in directorys
 /// beneath the given Path.
-pub fn get_todos_from_path(dir: &Path) -> Result<Vec<Todo>> {
-    if !dir.is_dir() {
+pub fn get_todos_from_path(dir: &dyn AsRef<Path>) -> Result<Vec<Todo>> {
+    if !dir.as_ref().is_dir() {
         return Err(anyhow::Error::new(MDTodoError::NotADir));
     }
 
-    md_reader::get_todos_from_dir(dir)
+    md_reader::get_todos_from_dir(dir.as_ref())
 }
 
 /// Toggles the done state of the todo in the physical file.
