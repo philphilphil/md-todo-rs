@@ -17,6 +17,20 @@ fn test_parse_single_file() {
 }
 
 #[test]
+fn test_parse_single_invalid_todo() {
+    let dir = TempDir::new().unwrap();
+    md_test_file_creator::simple_1_open_one_missformated(&dir, "file0.md").unwrap();
+
+    let todos = md_todo::get_todos_from_path(&dir).unwrap();
+    assert_eq!(todos.len(), 1);
+    assert_eq!(todos[0].name, "");
+    assert!(!todos[0].done);
+    assert_eq!(todos[0].filename, "file0.md");
+
+    dir.close().unwrap();
+}
+
+#[test]
 fn test_parse_single_complex_file() {
     let dir = TempDir::new().unwrap();
     md_test_file_creator::complex_23_todos_15_open(&dir, "file0.md").unwrap();

@@ -41,7 +41,7 @@ fn read_file(file: &DirEntry, todos: &mut Vec<Todo>) -> Result<()> {
     for (line_no, line) in file_content.lines().enumerate() {
         let line = line.trim_start();
 
-        if !line.starts_with("- [x]") && !line.starts_with("- [ ]") {
+        if !line.starts_with("- [x] ") && !line.starts_with("- [ ] ") {
             continue;
         }
 

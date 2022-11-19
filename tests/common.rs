@@ -10,6 +10,15 @@ pub mod md_test_file_creator {
         Ok(())
     }
 
+    #[allow(dead_code)] // code only used in tests, shows up as warning
+    pub fn simple_1_open_one_missformated(dir: &TempDir, filename: &str) -> io::Result<()> {
+        let file_path = dir.path().join(filename);
+        let md = "- [ ] 
+                  - [ ]"; //bottom one should not count as todo
+        fs::write(file_path, md)?; // should be found
+        Ok(())
+    }
+
     #[allow(dead_code)]
     pub fn simple_5_todos_4_open(dir: &TempDir, filename: &str) -> io::Result<()> {
         let file_path = dir.path().join(filename);
